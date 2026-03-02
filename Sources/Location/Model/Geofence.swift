@@ -3,7 +3,7 @@
 // copy, modify, and distribute this software in source code or binary form for use
 // in connection with the web services and APIs provided by Rover.
 //
-// This copyright notice shall be included in all copies or substantial portions of 
+// This copyright notice shall be included in all copies or substantial portions of
 // the software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -15,34 +15,34 @@
 
 import CoreData
 import CoreLocation
-import os
-import RoverFoundation
 import RoverData
+import RoverFoundation
+import os
 
 public final class Geofence: NSManagedObject {
     @nonobjc @available(*, deprecated, message: "Please use Geofence.geofenceFetchRequest() instead.")
     public class func fetchRequest() -> NSFetchRequest<Geofence> {
         return NSFetchRequest<Geofence>(entityName: "Geofence")
     }
-    
+
     public class func geofenceFetchRequest() -> NSFetchRequest<Geofence> {
         return NSFetchRequest<Geofence>(entityName: "Geofence")
     }
-    
+
     @NSManaged public internal(set) var id: String
     @NSManaged public internal(set) var name: String
     @NSManaged public internal(set) var latitude: Double
     @NSManaged public internal(set) var longitude: Double
     @NSManaged public internal(set) var radius: Double
     @NSManaged public internal(set) var tags: [String]
-    
+
     @NSManaged public private(set) var regionIdentifier: String
-    
+
     override public func awakeFromInsert() {
         super.awakeFromInsert()
         self.tags = []
     }
-    
+
     override public func willSave() {
         if self.regionIdentifier != self.region.identifier {
             self.regionIdentifier = self.region.identifier
@@ -59,7 +59,7 @@ extension Geofence {
             "name": self.name,
             "center": [self.latitude, self.longitude],
             "radius": self.radius,
-            "tags": self.tags
+            "tags": self.tags,
         ]
     }
 }
@@ -70,11 +70,11 @@ extension Geofence {
     public var coordinate: CLLocationCoordinate2D {
         return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
-    
+
     public var location: CLLocation {
         return CLLocation(latitude: latitude, longitude: longitude)
     }
-    
+
     public var region: CLCircularRegion {
         return CLCircularRegion(
             center: location.coordinate,
@@ -94,7 +94,7 @@ extension Geofence {
             attributes: ["geofence": self.attributes]
         )
     }
-    
+
     public var exitEvent: EventInfo {
         return EventInfo(
             name: "Geofence Exited",
@@ -107,15 +107,35 @@ extension Geofence {
 // MARK: Store Requests
 
 extension Geofence {
+    struct Snapshot: Hashable {
+        let objectID: NSManagedObjectID
+        let regionIdentifier: String
+        let latitude: Double
+        let longitude: Double
+        let radius: Double
+
+        var coordinate: CLLocationCoordinate2D {
+            CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        }
+
+        var region: CLCircularRegion {
+            CLCircularRegion(
+                center: coordinate,
+                radius: radius,
+                identifier: "\(latitude):\(longitude):\(radius)"
+            )
+        }
+    }
+
     public static func fetchAll(in context: NSManagedObjectContext) -> Set<Geofence> {
         let fetchRequest: NSFetchRequest<Geofence> = Geofence.geofenceFetchRequest()
         let geofences: [Geofence]
-        
+
         do {
             os_log("Fetching all geofences", log: .persistence, type: .debug)
 
             os_signpost(.begin, log: .persistence, name: "fetchGeofences", "type=all")
-            
+
             geofences = try context.fetch(fetchRequest)
 
             os_signpost(.end, log: .persistence, name: "fetchGeofences", "type=all")
@@ -124,23 +144,23 @@ extension Geofence {
             os_log("Failed to fetch geofences: %@", log: .persistence, type: .error, error.logDescription)
             return []
         }
-        
+
         os_log("Successfully fetched %d geofences", log: .persistence, type: .debug, geofences.count)
         return Set(geofences)
     }
-    
+
     public static func fetch(regionIdentifier: String, in context: NSManagedObjectContext) -> Geofence? {
         let fetchRequest: NSFetchRequest<Geofence> = Geofence.geofenceFetchRequest()
         let predicate = NSPredicate(format: "regionIdentifier == %@", regionIdentifier)
         fetchRequest.predicate = predicate
-        
+
         let geofences: [Geofence]
-        
+
         do {
             os_log("Fetching geofence with predicate: %{public}", log: .persistence, type: .debug, predicate)
 
             os_signpost(.begin, log: .persistence, name: "fetchGeofences", "type=regionIdentifier")
-            
+
             geofences = try context.fetch(fetchRequest)
 
             os_signpost(.end, log: .persistence, name: "fetchGeofences", "type=regionIdentifier")
@@ -148,18 +168,142 @@ extension Geofence {
             os_log("Failed to fetch geofence: %@", log: .persistence, type: .error, error.logDescription)
             return nil
         }
-        
+
         guard let geofence = geofences.first else {
             os_log("No geofence found matching regionIdentifier: %@", log: .persistence, type: .error, regionIdentifier)
             return nil
         }
-        
+
         os_log("Successfully fetched geofence: %{public}", log: .persistence, type: .debug, geofence)
         return geofence
     }
 
+    static func regions(
+        in context: NSManagedObjectContext,
+        closestTo coordinate: CLLocationCoordinate2D?,
+        maxLength: Int
+    ) -> Set<CLCircularRegion> {
+        var snapshots = [Snapshot]()
+        context.performAndWait {
+            snapshots = fetchSnapshots(in: context)
+        }
+
+        guard !snapshots.isEmpty else {
+            return []
+        }
+
+        let regions: [CLCircularRegion]
+        if let coordinate {
+            regions =
+                snapshots
+                .sorted {
+                    coordinate.distanceTo($0.coordinate) < coordinate.distanceTo($1.coordinate)
+                }
+                .prefix(maxLength)
+                .map(\.region)
+        } else {
+            regions = snapshots.shuffled().prefix(maxLength).map(\.region)
+        }
+
+        return Set(regions)
+    }
+
+    static func fetchSnapshot(
+        regionIdentifier: String,
+        in context: NSManagedObjectContext
+    ) -> Snapshot? {
+        var snapshot: Snapshot?
+        context.performAndWait {
+            snapshot = fetchSnapshotOnCurrentQueue(
+                regionIdentifier: regionIdentifier,
+                in: context
+            )
+        }
+        return snapshot
+    }
+
+    static func fetchSnapshotOnContextQueue(
+        regionIdentifier: String,
+        in context: NSManagedObjectContext
+    ) -> Snapshot? {
+        fetchSnapshotOnCurrentQueue(regionIdentifier: regionIdentifier, in: context)
+    }
+
+    static func resolve(_ snapshot: Snapshot, in context: NSManagedObjectContext) -> Geofence? {
+        var geofence: Geofence?
+        context.performAndWait {
+            geofence = resolveOnCurrentQueue(snapshot, in: context)
+        }
+        return geofence
+    }
+
+    static func resolveOnContextQueue(_ snapshot: Snapshot, in context: NSManagedObjectContext)
+        -> Geofence?
+    {
+        resolveOnCurrentQueue(snapshot, in: context)
+    }
+
+    private static func fetchSnapshots(in context: NSManagedObjectContext) -> [Snapshot] {
+        let fetchRequest: NSFetchRequest<Geofence> = Geofence.geofenceFetchRequest()
+
+        do {
+            let geofences = try context.fetch(fetchRequest)
+            return geofences.map {
+                Snapshot(
+                    objectID: $0.objectID,
+                    regionIdentifier: $0.regionIdentifier,
+                    latitude: $0.latitude,
+                    longitude: $0.longitude,
+                    radius: $0.radius
+                )
+            }
+        } catch {
+            os_log("Failed to fetch geofences: %@", log: .persistence, type: .error, error.logDescription)
+            return []
+        }
+    }
+
+    private static func fetchSnapshotOnCurrentQueue(
+        regionIdentifier: String,
+        in context: NSManagedObjectContext
+    ) -> Snapshot? {
+        let fetchRequest: NSFetchRequest<Geofence> = Geofence.geofenceFetchRequest()
+        fetchRequest.fetchLimit = 1
+        fetchRequest.predicate = NSPredicate(format: "regionIdentifier == %@", regionIdentifier)
+
+        do {
+            guard let geofence = try context.fetch(fetchRequest).first else {
+                return nil
+            }
+
+            return Snapshot(
+                objectID: geofence.objectID,
+                regionIdentifier: geofence.regionIdentifier,
+                latitude: geofence.latitude,
+                longitude: geofence.longitude,
+                radius: geofence.radius
+            )
+        } catch {
+            os_log("Failed to fetch geofence: %@", log: .persistence, type: .error, error.logDescription)
+            return nil
+        }
+    }
+
+    private static func resolveOnCurrentQueue(
+        _ snapshot: Snapshot,
+        in context: NSManagedObjectContext
+    ) -> Geofence? {
+        do {
+            return try context.existingObject(with: snapshot.objectID) as? Geofence
+        } catch {
+            os_log("Failed to resolve geofence: %@", log: .persistence, type: .error, error.logDescription)
+            return nil
+        }
+    }
+
     public static func deleteAll(in context: NSManagedObjectContext) {
-        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = Geofence.geofenceFetchRequest()  as! NSFetchRequest<NSFetchRequestResult>
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> =
+            Geofence.geofenceFetchRequest() as! NSFetchRequest<NSFetchRequestResult>
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         do {
             try context.execute(deleteRequest)
@@ -176,17 +320,17 @@ extension Collection where Element == Geofence {
         os_log("Sorting geofences...", log: .general, type: .debug)
 
         os_signpost(.begin, log: .general, name: "sortGeofences")
-        
+
         let sorted = self.sorted {
             coordinate.distanceTo($0.coordinate) < coordinate.distanceTo($1.coordinate)
         }
 
         os_signpost(.end, log: .general, name: "sortGeofences")
-        
+
         os_log("Sorted %d geofences", log: .general, type: .debug, self.count)
         return sorted
     }
-    
+
     public func regions(closestTo coordinate: CLLocationCoordinate2D?, maxLength: Int) -> Set<CLCircularRegion> {
         let regions: [CLCircularRegion]
         if let coordinate = coordinate {
@@ -194,7 +338,7 @@ extension Collection where Element == Geofence {
         } else {
             regions = self.shuffled().prefix(maxLength).compactMap { $0.region }
         }
-        
+
         return Set<CLCircularRegion>(regions)
     }
 }

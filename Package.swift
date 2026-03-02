@@ -61,8 +61,8 @@ let package = Package(
             targets: ["RoverNHLLiveActivities"]),
     ],
     dependencies: [
-        .package(url:"https://github.com/weichsel/ZIPFoundation", .upToNextMinor(from: "0.9.19")),
-        .package(url:"https://github.com/ticketmaster/iOS-TicketmasterSDK.git", .upToNextMajor(from: "1.7.0")),
+        .package(url: "https://github.com/weichsel/ZIPFoundation", .upToNextMinor(from: "0.9.19")),
+        .package(url: "https://github.com/ticketmaster/iOS-TicketmasterSDK.git", .upToNextMajor(from: "1.7.0")),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -114,20 +114,27 @@ let package = Package(
             name: "RoverTicketmaster",
             dependencies: [
                 "RoverData",
-                .product(name: "TicketmasterFoundation",
-                         package: "iOS-TicketmasterSDK"),
-                .product(name: "TicketmasterAuthentication",
-                         package: "iOS-TicketmasterSDK"),
-                .product(name: "TicketmasterSecureEntry",
-                         package: "iOS-TicketmasterSDK"),
-                .product(name: "TicketmasterTickets",
-                         package: "iOS-TicketmasterSDK"),
-                .product(name: "TicketmasterDiscoveryAPI",
-                         package: "iOS-TicketmasterSDK"),
-                .product(name: "TicketmasterPurchase",
-                        package: "iOS-TicketmasterSDK"),
-                .product(name: "TicketmasterSwiftProtobuf",
-                         package: "iOS-TicketmasterSDK"),
+                .product(
+                    name: "TicketmasterFoundation",
+                    package: "iOS-TicketmasterSDK"),
+                .product(
+                    name: "TicketmasterAuthentication",
+                    package: "iOS-TicketmasterSDK"),
+                .product(
+                    name: "TicketmasterSecureEntry",
+                    package: "iOS-TicketmasterSDK"),
+                .product(
+                    name: "TicketmasterTickets",
+                    package: "iOS-TicketmasterSDK"),
+                .product(
+                    name: "TicketmasterDiscoveryAPI",
+                    package: "iOS-TicketmasterSDK"),
+                .product(
+                    name: "TicketmasterPurchase",
+                    package: "iOS-TicketmasterSDK"),
+                .product(
+                    name: "TicketmasterSwiftProtobuf",
+                    package: "iOS-TicketmasterSDK"),
             ],
             path: "Sources/Ticketmaster",
             resources: [.copy("Resources/PrivacyInfo.xcprivacy")]),
@@ -199,6 +206,11 @@ let package = Package(
             name: "RoverExperiencesTests",
             dependencies: ["RoverExperiences"],
             path: "Tests/ExperiencesTests"),
+        .testTarget(
+            name: "RoverLocationTests",
+            dependencies: ["RoverLocation"],
+            path: "Tests/LocationTests",
+            sources: ["RoverLocationConcurrencyTests.swift"]),
         .testTarget(
             name: "RoverNotificationsTests",
             dependencies: ["RoverNotifications", "RoverData"],

@@ -3,7 +3,7 @@
 // copy, modify, and distribute this software in source code or binary form for use
 // in connection with the web services and APIs provided by Rover.
 //
-// This copyright notice shall be included in all copies or substantial portions of 
+// This copyright notice shall be included in all copies or substantial portions of
 // the software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -14,67 +14,98 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import Foundation
-import os.log
-import RoverFoundation
 import RoverData
+import RoverFoundation
+import os.log
 
 class SeatGeekManager: SeatGeekAuthorizer, PrivacyListener {
     private let userInfoManager: UserInfoManager
     private let privacyService: PrivacyService
-    
+
+    // NOTE: seatGeekID is actually the CRM ID ("crmID"). The variable name is maintained for backward compatibility.
     private var seatGeekID = PersistedValue<String>(storageKey: "io.rover.SeatGeek")
-    
+    private var seatGeekClientID = PersistedValue<String>(storageKey: "io.rover.SeatGeek.seatGeekClientID")
+
     private var seatGeekUserInfo: [String: String]? {
-        guard let seatGeekID = self.seatGeekID.value else {
-            return nil
+        var dictionary = [String: String]()
+
+        if let seatGeekID = self.seatGeekID.value {
+            dictionary["seatGeekID"] = seatGeekID
         }
-        
-        return ["seatGeekID": seatGeekID]
+
+        if let clientID = self.seatGeekClientID.value {
+            dictionary["seatGeekClientID"] = clientID
+        }
+
+        return dictionary.isEmpty ? nil : dictionary
     }
-    
+
     init(userInfoManager: UserInfoManager, privacyService: PrivacyService) {
         self.userInfoManager = userInfoManager
         self.privacyService = privacyService
     }
 
-// MARK: SeatGeekAuthorizer
-    
+    // MARK: SeatGeekAuthorizer
+
     func setSeatGeekID(_ id: String) {
         guard privacyService.trackingMode == .default else {
-            os_log("SeatGeek ID set while privacy is in anonymous/anonymized mode, ignored", log: .seatgeek, type: .info)
+            os_log(
+                "SeatGeek IDs set while privacy is in anonymous/anonymized mode, ignored",
+                log: .seatgeek,
+                type: .info
+            )
             return
         }
-        
+
         self.seatGeekID.value = id
-        
-        if let userInfo = seatGeekUserInfo {
-            self.userInfoManager.updateUserInfo {
-                if let existingSeatGeekUserInfo = $0.rawValue["seatGeek"] as? Attributes {
-                    // seatgeek data already exists, just clobber it:
-                    $0.rawValue["seatGeek"] = Attributes(rawValue: existingSeatGeekUserInfo.rawValue.merging(userInfo) { $1 })
-                } else {
-                    // seatgeek data does not already exist, so set it:
-                    $0.rawValue["seatGeek"] = Attributes(rawValue: userInfo)
-                }
-            }
-            
-            os_log("SeatGeekID has been set: %s", log: .general, seatGeekID.value!)
-        }
+        self.seatGeekClientID.value = nil
+        updateUserInfo()
     }
-    
+
+    func setSeatGeekIDs(clientID: String, crmID: String) {
+        guard privacyService.trackingMode == .default else {
+            os_log(
+                "SeatGeek IDs set while privacy is in anonymous/anonymized mode, ignored",
+                log: .seatgeek,
+                type: .info
+            )
+            return
+        }
+
+        self.seatGeekID.value = crmID
+        self.seatGeekClientID.value = clientID
+
+        updateUserInfo()
+    }
+
     func clearCredentials() {
         self.seatGeekID.value = nil
+        self.seatGeekClientID.value = nil
         self.userInfoManager.updateUserInfo { attributes in
             attributes.rawValue["seatGeek"] = nil
         }
     }
-    
+
     // MARK: Privacy
-    
+
     func trackingModeDidChange(_ trackingMode: PrivacyService.TrackingMode) {
-        if(trackingMode != .default) {
-            os_log("Tracking disabled, seatgeek data cleared", log: .seatgeek)
+        if trackingMode != .default {
+            os_log(
+                "Tracking disabled, seatgeek data cleared", log: .seatgeek
+            )
             clearCredentials()
         }
+    }
+
+    private func updateUserInfo() {
+        self.userInfoManager.updateUserInfo {
+            $0.rawValue["seatGeek"] = seatGeekUserInfo.map { Attributes(rawValue: $0) }
+        }
+
+        os_log(
+            "SeatGeek IDs have been set.",
+            log: .seatgeek,
+            type: .info
+        )
     }
 }

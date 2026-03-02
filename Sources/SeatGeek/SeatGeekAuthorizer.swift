@@ -3,7 +3,7 @@
 // copy, modify, and distribute this software in source code or binary form for use
 // in connection with the web services and APIs provided by Rover.
 //
-// This copyright notice shall be included in all copies or substantial portions of 
+// This copyright notice shall be included in all copies or substantial portions of
 // the software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -17,12 +17,22 @@
 public protocol SeatGeekAuthorizer {
     /**
      Set the user's SeatGeek credentials after a successful sign-in.
-     
+    
      - Parameters:
      - crmID: The value of the `crmID` property.
      */
+    @available(*, deprecated, renamed: "setSeatGeekIDs")
     func setSeatGeekID(_ crmID: String)
+
+    /**
+     Set the user's SeatGeek credentials after a successful sign-in.
     
+     - Parameters:
+       - clientID: The SeatGeek client ID.
+       - crmID: The SeatGeek CRM ID.
+     */
+    func setSeatGeekIDs(clientID: String, crmID: String)
+
     /**
      Clear the user's SeatGeek credentials after a successful sign-out.
      */

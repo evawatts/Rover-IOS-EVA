@@ -90,6 +90,13 @@ public class HomeViewManager: ObservableObject {
             return .userID(ticketmasterID)
         }
 
+        if let seatGeekClientID = userInfo["seatGeek.seatGeekClientID"] as? String,
+            !seatGeekClientID.isEmpty
+        {
+            return .userID(seatGeekClientID)
+        }
+
+        // Note: seatGeekID is the SeatGeek CRM ID
         if let seatGeekID = userInfo["seatGeek.seatGeekID"] as? String,
             !seatGeekID.isEmpty
         {

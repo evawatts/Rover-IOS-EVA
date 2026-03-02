@@ -32,7 +32,7 @@ class ViewController: UITabBarController {
         // Create the Hub hosting controller
         hubController = HubHostingController()
         hubController.tabBarItem = UITabBarItem(
-            title: "For You", image: UIImage(systemName: "person.circle.fill"), tag: 0)
+            title: "Hub", image: UIImage(systemName: "person.circle.fill"), tag: 0)
 
         // Add the settings view controller to the tab bar.  Note that you typically wouldn't want to add this to the tab bar in your application.  Refer to the documentation.
         let settingsViewController = Rover.shared.resolve(UIViewController.self, name: "settings")!

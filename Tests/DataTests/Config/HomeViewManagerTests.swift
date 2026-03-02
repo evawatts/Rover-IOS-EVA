@@ -281,6 +281,67 @@ final class HomeViewManagerTests: XCTestCase {
         XCTAssertEqual(components.queryItems?.first?.value, "sg-456")
     }
 
+    func testFetchPassesSeatGeekClientIDWhenNoOtherUserID() async {
+        var capturedURL: URL?
+        let json = """
+            { "experienceURL": "https://example.com" }
+            """.data(using: .utf8)!
+
+        URLProtocolStub.requestHandler = { request in
+            capturedURL = request.url
+            let response = HTTPURLResponse(
+                url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+            return (response, json)
+        }
+
+        mockUserInfoManager.userInfo = [
+            "seatGeek.seatGeekClientID": "client-123"
+        ]
+
+        let manager = await MainActor.run {
+            HomeViewManager(
+                httpClient: httpClient, userDefaults: userDefaults,
+                userInfoManager: mockUserInfoManager)
+        }
+
+        await manager.fetch()
+
+        let components = URLComponents(url: capturedURL!, resolvingAgainstBaseURL: false)!
+        XCTAssertEqual(components.queryItems?.first?.name, "userID")
+        XCTAssertEqual(components.queryItems?.first?.value, "client-123")
+    }
+
+    func testFetchPrefersSeatGeekClientIDOverSeatGeekCRMIDWhenNoHigherPriorityID() async {
+        var capturedURL: URL?
+        let json = """
+            { "experienceURL": "https://example.com" }
+            """.data(using: .utf8)!
+
+        URLProtocolStub.requestHandler = { request in
+            capturedURL = request.url
+            let response = HTTPURLResponse(
+                url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+            return (response, json)
+        }
+
+        mockUserInfoManager.userInfo = [
+            "seatGeek.seatGeekClientID": "client-123",
+            "seatGeek.seatGeekID": "crm-456"
+        ]
+
+        let manager = await MainActor.run {
+            HomeViewManager(
+                httpClient: httpClient, userDefaults: userDefaults,
+                userInfoManager: mockUserInfoManager)
+        }
+
+        await manager.fetch()
+
+        let components = URLComponents(url: capturedURL!, resolvingAgainstBaseURL: false)!
+        XCTAssertEqual(components.queryItems?.first?.name, "userID")
+        XCTAssertEqual(components.queryItems?.first?.value, "client-123")
+    }
+
     func testFetchPrefersDirectUserIDOverTicketmaster() async {
         var capturedURL: URL?
         let json = """
