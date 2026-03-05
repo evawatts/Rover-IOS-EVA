@@ -1,4 +1,10 @@
-# Rover iOS SDK
+# Rover iOS SDK - Eva's Working Copy
+
+**This is Eva's working copy of the Rover iOS SDK for development and modifications related to Rover 5 SDK architecture changes.**
+
+Original repository: https://github.com/RoverPlatform/rover-ios
+
+---
 
 This is the Rover SDK, which includes our core Rover Experiences product and marketing campaigns automation.  The Rover SDK allows for the creation of mobile experiences, with added engagement and monetization for better mobile campaigns.
 
