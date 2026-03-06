@@ -9,6 +9,9 @@ let package = Package(
     platforms: [.iOS(.v17)],
     products: [
         .library(
+            name: "Rover",
+            targets: ["Rover"]),
+        .library(
             name: "RoverFoundation",
             targets: ["RoverFoundation"]),
         .library(
@@ -24,14 +27,8 @@ let package = Package(
             name: "RoverNotifications",
             targets: ["RoverNotifications"]),
         .library(
-            name: "RoverLocation",
-            targets: ["RoverLocation"]),
-        .library(
             name: "RoverDebug",
             targets: ["RoverDebug"]),
-        .library(
-            name: "RoverTelephony",
-            targets: ["RoverTelephony"]),
         .library(
             name: "RoverTicketmaster",
             targets: ["RoverTicketmaster"]),
@@ -41,9 +38,6 @@ let package = Package(
         .library(
             name: "RoverAxs",
             targets: ["RoverAxs"]),
-        .library(
-            name: "RoverAdobeExperience",
-            targets: ["RoverAdobeExperience"]),
         .library(
             name: "RoverAppExtensions",
             targets: ["RoverAppExtensions"]),
@@ -67,6 +61,10 @@ let package = Package(
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
+        .target(
+            name: "Rover",
+            dependencies: ["RoverFoundation", "RoverData"],
+            path: "Sources/Rover"),
         .target(
             name: "RoverFoundation",
             dependencies: [],
@@ -96,19 +94,9 @@ let package = Package(
             path: "Sources/Experiences",
             resources: [.copy("Resources/PrivacyInfo.xcprivacy")]),
         .target(
-            name: "RoverLocation",
-            dependencies: ["RoverData"],
-            path: "Sources/Location",
-            resources: [.copy("Resources/PrivacyInfo.xcprivacy")]),
-        .target(
             name: "RoverNotifications",
             dependencies: ["RoverData", "RoverUI", "RoverExperiences"],
             path: "Sources/Notifications",
-            resources: [.copy("Resources/PrivacyInfo.xcprivacy")]),
-        .target(
-            name: "RoverTelephony",
-            dependencies: ["RoverData"],
-            path: "Sources/Telephony",
             resources: [.copy("Resources/PrivacyInfo.xcprivacy")]),
         .target(
             name: "RoverTicketmaster",
@@ -147,11 +135,6 @@ let package = Package(
             name: "RoverAxs",
             dependencies: ["RoverData"],
             path: "Sources/AXS",
-            resources: [.copy("Resources/PrivacyInfo.xcprivacy")]),
-        .target(
-            name: "RoverAdobeExperience",
-            dependencies: ["RoverData"],
-            path: "Sources/AdobeExperience",
             resources: [.copy("Resources/PrivacyInfo.xcprivacy")]),
         .target(
             name: "RoverLiveActivities",
@@ -207,18 +190,9 @@ let package = Package(
             dependencies: ["RoverExperiences"],
             path: "Tests/ExperiencesTests"),
         .testTarget(
-            name: "RoverLocationTests",
-            dependencies: ["RoverLocation"],
-            path: "Tests/LocationTests",
-            sources: ["RoverLocationConcurrencyTests.swift"]),
-        .testTarget(
             name: "RoverNotificationsTests",
             dependencies: ["RoverNotifications", "RoverData"],
             path: "Tests/NotificationsTests"),
-        .testTarget(
-            name: "RoverTelephonyTests",
-            dependencies: ["RoverTelephony"],
-            path: "Tests/TelephonyTests"),
         .testTarget(
             name: "RoverTicketmasterTests",
             dependencies: ["RoverTicketmaster"],
