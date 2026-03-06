@@ -1,4 +1,7 @@
-# Installation Guide
+---
+layout: page
+title: Installation Guide
+---
 
 The Rover 5 iOS SDK is designed for easy integration with modern iOS development workflows. Follow this step-by-step guide to add Rover 5 to your project.
 

@@ -12,8 +12,8 @@ kramdown:
   syntax_highlighter_opts:
     default_lang: swift
 
-# Theme
-theme: minima
+# Theme - using custom layouts
+# theme: minima
 
 # Navigation
 header_pages:

@@ -1,4 +1,7 @@
-# Quick Start Guide
+---
+layout: page
+title: Quick Start Guide
+---
 
 Get up and running with Rover 5 in just a few minutes. This guide will walk you through the basic setup and your first event tracking implementation.
 
