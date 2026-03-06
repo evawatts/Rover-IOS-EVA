@@ -1,47 +1,49 @@
 <nav class="site-nav">
-  <div class="nav-section">
-    <h3>Getting Started</h3>
-    <ul>
-      <li><a href="{{ '/getting-started/installation.html' | relative_url }}">Installation</a></li>
-      <li><a href="{{ '/getting-started/quick-start.html' | relative_url }}">Quick Start</a></li>
-      <li><a href="{{ '/getting-started/configuration.html' | relative_url }}">Configuration</a></li>
-    </ul>
-  </div>
+  <ul role="list">
+    <li class="nav-section">
+      <h2>iOS Setup</h2>
+      <ul role="list">
+        <li><a href="{{ '/getting-started/installation.html' | relative_url }}"{% if page.url == '/getting-started/installation.html' %} class="current"{% endif %}>Install</a></li>
+        <li><a href="{{ '/getting-started/quick-start.html' | relative_url }}"{% if page.url == '/getting-started/quick-start.html' %} class="current"{% endif %}>Quick Start</a></li>
+        <li><a href="{{ '/getting-started/configuration.html' | relative_url }}"{% if page.url == '/getting-started/configuration.html' %} class="current"{% endif %}>Configuration</a></li>
+      </ul>
+    </li>
 
-  <div class="nav-section">
-    <h3>Migration</h3>
-    <ul>
-      <li><a href="{{ '/migration/from-rover-4.html' | relative_url }}">From Rover 4</a></li>
-      <li><a href="{{ '/migration/breaking-changes.html' | relative_url }}">Breaking Changes</a></li>
-      <li><a href="{{ '/migration/examples.html' | relative_url }}">Migration Examples</a></li>
-    </ul>
-  </div>
+    <li class="nav-section">
+      <h2>Migration</h2>
+      <ul role="list">
+        <li><a href="{{ '/migration/from-rover-4.html' | relative_url }}"{% if page.url == '/migration/from-rover-4.html' %} class="current"{% endif %}>From Rover 4</a></li>
+        <li><a href="{{ '/migration/breaking-changes.html' | relative_url }}"{% if page.url == '/migration/breaking-changes.html' %} class="current"{% endif %}>Breaking Changes</a></li>
+        <li><a href="{{ '/migration/examples.html' | relative_url }}"{% if page.url == '/migration/examples.html' %} class="current"{% endif %}>Migration Examples</a></li>
+      </ul>
+    </li>
 
-  <div class="nav-section">
-    <h3>API Reference</h3>
-    <ul>
-      <li><a href="{{ '/api-reference/rover.html' | relative_url }}">Rover Class</a></li>
-      <li><a href="{{ '/api-reference/configuration.html' | relative_url }}">Configuration</a></li>
-      <li><a href="{{ '/api-reference/event-tracking.html' | relative_url }}">Event Tracking</a></li>
-      <li><a href="{{ '/api-reference/user-management.html' | relative_url }}">User Management</a></li>
-    </ul>
-  </div>
+    <li class="nav-section">
+      <h2>API Reference</h2>
+      <ul role="list">
+        <li><a href="{{ '/api-reference/rover.html' | relative_url }}"{% if page.url == '/api-reference/rover.html' %} class="current"{% endif %}>Rover Class</a></li>
+        <li><a href="{{ '/api-reference/configuration.html' | relative_url }}"{% if page.url == '/api-reference/configuration.html' %} class="current"{% endif %}>Configuration</a></li>
+        <li><a href="{{ '/api-reference/event-tracking.html' | relative_url }}"{% if page.url == '/api-reference/event-tracking.html' %} class="current"{% endif %}>Event Tracking</a></li>
+        <li><a href="{{ '/api-reference/user-management.html' | relative_url }}"{% if page.url == '/api-reference/user-management.html' %} class="current"{% endif %}>User Management</a></li>
+      </ul>
+    </li>
 
-  <div class="nav-section">
-    <h3>Performance</h3>
-    <ul>
-      <li><a href="{{ '/performance/benchmarks.html' | relative_url }}">Benchmarks</a></li>
-      <li><a href="{{ '/performance/best-practices.html' | relative_url }}">Best Practices</a></li>
-      <li><a href="{{ '/performance/event-batching.html' | relative_url }}">Event Batching</a></li>
-    </ul>
-  </div>
+    <li class="nav-section">
+      <h2>Performance</h2>
+      <ul role="list">
+        <li><a href="{{ '/performance/benchmarks.html' | relative_url }}"{% if page.url == '/performance/benchmarks.html' %} class="current"{% endif %}>Benchmarks</a></li>
+        <li><a href="{{ '/performance/best-practices.html' | relative_url }}"{% if page.url == '/performance/best-practices.html' %} class="current"{% endif %}>Best Practices</a></li>
+        <li><a href="{{ '/performance/event-batching.html' | relative_url }}"{% if page.url == '/performance/event-batching.html' %} class="current"{% endif %}>Event Batching</a></li>
+      </ul>
+    </li>
 
-  <div class="nav-section">
-    <h3>Resources</h3>
-    <ul>
-      <li><a href="{{ site.rover.github_url }}" target="_blank">GitHub Repository</a></li>
-      <li><a href="{{ site.rover.github_url }}/issues" target="_blank">Report Issues</a></li>
-      <li><a href="mailto:support@rover.io">Email Support</a></li>
-    </ul>
-  </div>
+    <li class="nav-section">
+      <h2>Resources</h2>
+      <ul role="list">
+        <li><a href="{{ site.rover.github_url }}" target="_blank">GitHub Repository</a></li>
+        <li><a href="{{ site.rover.github_url }}/issues" target="_blank">Report Issues</a></li>
+        <li><a href="mailto:support@rover.io">Email Support</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>

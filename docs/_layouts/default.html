@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html class="antialiased" lang="{{ page.lang | default: site.lang | default: 'en' }}">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.title %}{{ page.title | escape }} | {% endif %}{{ site.title | escape }}</title>
+  <meta name="description" content="{{ page.excerpt | default: site.description | strip_html | normalize_whitespace | truncate: 160 | escape }}">
+
+  <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+  
+  {% feed_meta %}
+  {% if jekyll.environment == 'production' and site.google_analytics %}
+    {% include google-analytics.html %}
+  {% endif %}
+
+  <!-- Dark mode script -->
+  <script>
+    let isDarkMode = window.matchMedia('(prefers-color-scheme: dark)')
+
+    function updateTheme(theme) {
+      theme = theme ?? window.localStorage.theme ?? 'system'
+
+      if (theme === 'dark' || (theme === 'system' && isDarkMode.matches)) {
+        document.documentElement.classList.add('dark')
+      } else if (theme === 'light' || (theme === 'system' && !isDarkMode.matches)) {
+        document.documentElement.classList.remove('dark')
+      }
+
+      return theme
+    }
+
+    function updateThemeWithoutTransitions(theme) {
+      updateTheme(theme)
+      document.documentElement.classList.add('[&_*]:!transition-none')
+      window.setTimeout(() => {
+        document.documentElement.classList.remove('[&_*]:!transition-none')
+      }, 0)
+    }
+
+    document.documentElement.setAttribute('data-theme', updateTheme())
+
+    new MutationObserver(([{ oldValue }]) => {
+      let newValue = document.documentElement.getAttribute('data-theme')
+      if (newValue !== oldValue) {
+        try {
+          window.localStorage.setItem('theme', newValue)
+        } catch {}
+        updateThemeWithoutTransitions(newValue)
+      }
+    }).observe(document.documentElement, { attributeFilter: ['data-theme'], attributeOldValue: true })
+
+    isDarkMode.addEventListener('change', () => updateThemeWithoutTransitions())
+  </script>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="nav-toggle" style="display: none;">
+      <button type="button" aria-label="Open navigation">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+          <path d="M4 7h16M4 12h16M4 17h16"></path>
+        </svg>
+      </button>
+    </div>
+    
+    <div>
+      <a href="{{ '/' | relative_url }}" class="site-logo" aria-label="Home page">
+        <svg width="91px" height="18px" viewBox="0 0 91 18" version="1.1">
+          <g class="logo-text" fill-rule="evenodd">
+            <path d="M28.2929423,18.0001533 C23.3300614,18.0001533 19.2926259,13.9625808 19.2926259,9.00011091 C19.2926259,4.03750399 23.3300614,0 28.2929423,0 C33.2555492,0 37.2929847,4.03750399 37.2933272,9.00011091 C37.2933272,13.9625808 33.2555492,18.0001533 28.2929423,18.0001533 Z M28.2929423,3.30872428 C31.4310997,3.30872428 33.9843289,5.86195355 33.9843289,9.00011091 C33.9843289,12.1384738 31.4310997,14.6910865 28.2929423,14.6910865 C25.1548534,14.6910865 22.6015557,12.1384738 22.6015557,9.00011091 C22.6015557,5.86195355 25.1548534,3.30872428 28.2929423,3.30872428 Z M86.4227136,11.3687991 L90.9988392,18.0001533 L87.1825241,18.0001533 L80.3882751,8.73549243 L83.6532959,8.73549243 C85.1492842,8.73549243 86.36668,7.51837071 86.36668,6.02210835 C86.36668,4.52577749 85.1495582,3.30872428 83.6532959,3.30872428 L78.5486184,3.30872428 L78.5483444,18.0001533 L75.2396201,18.0001533 L75.2396201,3.29447612 L73.0999985,0.0142481605 L73.0999985,0 L83.6530219,0 C86.9740078,0 89.6754042,2.70132794 89.6754042,6.02210835 C89.6754042,8.34496953 88.3534763,10.3647148 86.4227136,11.3687991 Z M13.3227151,11.3687991 L17.8988407,18.0001533 L14.0825257,18.0001533 L7.28827662,8.73549243 L10.5532974,8.73549243 C12.0492173,8.73549243 13.2666815,7.51837071 13.2666815,6.02210835 C13.2666815,4.52577749 12.0495598,3.30872428 10.5532974,3.30872428 L5.44868839,3.30872428 L5.44834589,18.0001533 L2.13962161,18.0001533 L2.13962161,3.29447612 L0,0.0142481605 L0,0 L10.5530234,0 C13.8740093,0 16.5754058,2.70132794 16.5754058,6.02210835 C16.5754058,8.34496953 15.2534779,10.3647148 13.3227151,11.3687991 Z M71.3444444,18.0001533 L58.8708648,18.0001533 L58.8705223,0.0237012671 L71.3444444,0.0237012671 L71.3444444,3.30427173 L62.1510243,3.30427173 L62.1512983,7.37184756 L69.4336153,7.37184756 L69.4336153,10.6520755 L62.1512983,10.6520755 L62.1510243,14.7198569 L71.3444444,14.7198569 L71.3444444,18.0001533 Z M52.9034886,0 L56.4238803,0 L49.4213889,18.0001533 L44.8496473,18.0001533 L37.8471559,0 L41.3675476,0 L47.1355181,14.8269236 L52.9034886,0 Z" fill="#09244B"></path>
+          </g>
+        </svg>
+      </a>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 1.5rem;">
+      <button class="theme-toggle" type="button" aria-label="Toggle theme">
+        <svg aria-hidden="true" viewBox="0 0 16 16" class="hidden [[data-theme=light]_&]:block">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M7 1a1 1 0 0 1 2 0v1a1 1 0 1 1-2 0V1Zm4 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm2.657-5.657a1 1 0 0 0-1.414 0l-.707.707a1 1 0 0 0 1.414 1.414l.707-.707a1 1 0 0 0 0-1.414Zm-1.415 11.313-.707-.707a1 1 0 0 1 1.415-1.415l.707.708a1 1 0 0 1-1.415 1.414ZM16 7.999a1 1 0 0 0-1-1h-1a1 1 0 1 0 0 2h1a1 1 0 0 0 1-1ZM7 14a1 1 0 1 1 2 0v1a1 1 0 1 1-2 0v-1Zm-2.536-2.464a1 1 0 0 0-1.414 0l-.707.707a1 1 0 0 0 1.414 1.414l.707-.707a1 1 0 0 0 0-1.414Zm0-8.486A1 1 0 0 1 3.05 4.464l-.707-.707a1 1 0 0 1 1.414-1.414l.707.707ZM3 8a1 1 0 0 0-1-1H1a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Z"></path>
+        </svg>
+        <svg aria-hidden="true" viewBox="0 0 16 16" class="hidden [[data-theme=dark]_&]:block">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M7.23 3.333C7.757 2.905 7.68 2 7 2a6 6 0 1 0 0 12c.68 0 .758-.905.23-1.332A5.989 5.989 0 0 1 5 8c0-1.885.87-3.568 2.23-4.668ZM12 5a1 1 0 0 1 1 1 1 1 0 0 0 1 1 1 1 0 1 1 0 2 1 1 0 0 0-1 1 1 1 0 1 1-2 0 1 1 0 0 0-1-1 1 1 0 1 1 0-2 1 1 0 0 0 1-1 1 1 0 0 1 1-1Z"></path>
+        </svg>
+        <svg aria-hidden="true" viewBox="0 0 16 16" class="hidden [:not(.dark)[data-theme=system]_&]:block">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M7 1a1 1 0 0 1 2 0v1a1 1 0 1 1-2 0V1Zm4 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm2.657-5.657a1 1 0 0 0-1.414 0l-.707.707a1 1 0 0 0 1.414 1.414l.707-.707a1 1 0 0 0 0-1.414Zm-1.415 11.313-.707-.707a1 1 0 0 1 1.415-1.415l.707.708a1 1 0 0 1-1.415 1.414ZM16 7.999a1 1 0 0 0-1-1h-1a1 1 0 1 0 0 2h1a1 1 0 0 0 1-1ZM7 14a1 1 0 1 1 2 0v1a1 1 0 1 1-2 0v-1Zm-2.536-2.464a1 1 0 0 0-1.414 0l-.707.707a1 1 0 0 0 1.414 1.414l.707-.707a1 1 0 0 0 0-1.414Zm0-8.486A1 1 0 0 1 3.05 4.464l-.707-.707a1 1 0 0 1 1.414-1.414l.707.707ZM3 8a1 1 0 0 0-1-1H1a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Z"></path>
+        </svg>
+        <svg aria-hidden="true" viewBox="0 0 16 16" class="hidden [.dark[data-theme=system]_&]:block">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M7.23 3.333C7.757 2.905 7.68 2 7 2a6 6 0 1 0 0 12c.68 0 .758-.905.23-1.332A5.989 5.989 0 0 1 5 8c0-1.885.87-3.568 2.23-4.668ZM12 5a1 1 0 0 1 1 1 1 1 0 0 0 1 1 1 1 0 1 1 0 2 1 1 0 0 0-1 1 1 1 0 1 1-2 0 1 1 0 0 0-1-1 1 1 0 1 1 0-2 1 1 0 0 0 1-1 1 1 0 0 1 1-1Z"></path>
+        </svg>
+      </button>
+      
+      <a href="{{ site.rover.github_url }}" class="site-logo" aria-label="GitHub" target="_blank">
+        <svg aria-hidden="true" viewBox="0 0 16 16" style="width: 1.5rem; height: 1.5rem; fill: #94a3b8;">
+          <path d="M8 0C3.58 0 0 3.58 0 8C0 11.54 2.29 14.53 5.47 15.59C5.87 15.66 6.02 15.42 6.02 15.21C6.02 15.02 6.01 14.39 6.01 13.72C4 14.09 3.48 13.23 3.32 12.78C3.23 12.55 2.84 11.84 2.5 11.65C2.22 11.5 1.82 11.13 2.49 11.12C3.12 11.11 3.57 11.7 3.72 11.94C4.44 13.15 5.59 12.81 6.05 12.6C6.12 12.08 6.33 11.73 6.56 11.53C4.78 11.33 2.92 10.64 2.92 7.58C2.92 6.71 3.23 5.99 3.74 5.43C3.66 5.23 3.38 4.41 3.82 3.31C3.82 3.31 4.49 3.1 6.02 4.13C6.66 3.95 7.34 3.86 8.02 3.86C8.7 3.86 9.38 3.95 10.02 4.13C11.55 3.09 12.22 3.31 12.22 3.31C12.66 4.41 12.38 5.23 12.3 5.43C12.81 5.99 13.12 6.7 13.12 7.58C13.12 10.65 11.25 11.33 9.47 11.53C9.76 11.78 10.01 12.26 10.01 13.01C10.01 14.08 10 14.94 10 15.21C10 15.42 10.15 15.67 10.55 15.59C13.71 14.53 16 11.53 16 8C16 3.58 12.42 0 8 0Z"></path>
+        </svg>
+      </a>
+    </div>
+  </header>
+
+  <div class="site-container">
+    <div class="sidebar">
+      <div class="sidebar-content">
+        {% include nav.html %}
+      </div>
+    </div>
+
+    <main class="main-content">
+      {{ content }}
+    </main>
+  </div>
+
+  <!-- Theme toggle functionality -->
+  <script>
+    // Theme toggle functionality
+    document.querySelector('.theme-toggle').addEventListener('click', function() {
+      let currentTheme = document.documentElement.getAttribute('data-theme')
+      let newTheme = currentTheme === 'dark' ? 'light' : 'dark'
+      document.documentElement.setAttribute('data-theme', newTheme)
+    })
+  </script>
+</body>
+
+</html>

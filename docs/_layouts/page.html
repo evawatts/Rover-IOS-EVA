@@ -1,0 +1,35 @@
+---
+layout: default
+---
+
+<article>
+  <header class="article-header">
+    <h1 class="article-title">{{ page.title | escape }}</h1>
+  </header>
+
+  <div class="prose">
+    {{ content }}
+  </div>
+</article>
+
+{% if page.prev_page or page.next_page %}
+<nav class="page-nav">
+  {% if page.prev_page %}
+  <div class="page-nav-prev">
+    <div class="page-nav-label">Previous</div>
+    <a href="{{ page.prev_page.url | relative_url }}" class="page-nav-link">
+      ← {{ page.prev_page.title | escape }}
+    </a>
+  </div>
+  {% endif %}
+  
+  {% if page.next_page %}
+  <div class="page-nav-next">
+    <div class="page-nav-label">Next</div>
+    <a href="{{ page.next_page.url | relative_url }}" class="page-nav-link">
+      {{ page.next_page.title | escape }} →
+    </a>
+  </div>
+  {% endif %}
+</nav>
+{% endif %}

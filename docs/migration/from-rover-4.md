@@ -396,7 +396,7 @@ class ViewController: UIViewController {
 **Build Errors After Migration**
 - Clean build folder
 - Reset package caches
-- Verify iOS 13.0+ deployment target
+- Verify iOS 17.0+ deployment target
 
 **Events Not Sending**
 - Check API key (not account token)

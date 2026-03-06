@@ -4,9 +4,9 @@ The Rover 5 iOS SDK is designed for easy integration with modern iOS development
 
 ## Requirements
 
-- **iOS 13.0+**
-- **Xcode 12.0+**
-- **Swift 5.3+**
+- **iOS 17.0+**
+- **Xcode 15.0+**
+- **Swift 5.9+**
 
 ## Installation Methods
 
@@ -108,14 +108,14 @@ If you encounter build errors after installation:
 
 1. **Clean Build Folder** - Product → Clean Build Folder
 2. **Reset Package Caches** - File → Packages → Reset Package Caches
-3. **Update to Latest Xcode** - Ensure you're using Xcode 12.0+
+3. **Update to Latest Xcode** - Ensure you're using Xcode 15.0+
 
 ### Import Issues
 
 If `import Rover` fails:
 
 1. Verify the package is added to your target
-2. Check your deployment target is iOS 13.0+
+2. Check your deployment target is iOS 17.0+
 3. Ensure you've selected the "Rover" product during installation
 
 ### Network Issues

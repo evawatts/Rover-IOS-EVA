@@ -268,7 +268,7 @@ Now that you have basic tracking working:
 
 ### Build Issues?
 
-1. Ensure iOS 13.0+ deployment target
+1. Ensure iOS 17.0+ deployment target
 2. Clean build folder and rebuild
 3. Check [installation guide](installation.html) steps
 
