@@ -24,6 +24,7 @@ public struct Event: Codable, Equatable {
         case attributes
         case context = "device"
         case timestamp
+        case category
     }
     
     public let id = UUID()
@@ -33,13 +34,22 @@ public struct Event: Codable, Equatable {
     public var attributes: Attributes?
     public var context: Context
     public var timestamp: Date
+    public var category: EventCategory
     
-    public init(name: String, context: Context, namespace: String? = nil, attributes: Attributes? = nil, timestamp: Date = Date()) {
+    public init(name: String, context: Context, namespace: String? = nil, attributes: Attributes? = nil, timestamp: Date = Date(), category: EventCategory? = nil) {
         self.name = name
         self.namespace = namespace
         self.attributes = attributes
         self.context = context
         self.timestamp = timestamp
+        
+        // Auto-classify if no category provided (backward compatibility)
+        if let category = category {
+            self.category = category
+        } else {
+            // Use synchronous classification for backward compatibility
+            self.category = EventClassifier.classifySync(name, namespace: namespace)
+        }
     }
 }
 

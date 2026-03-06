@@ -1,0 +1,50 @@
+title: Rover 5 iOS SDK Documentation
+description: Official documentation for the Rover 5 iOS SDK - simplified mobile experiences and marketing automation
+baseurl: "/Rover-IOS-EVA"
+url: "https://evawatts.github.io"
+
+# Build settings
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    default_lang: swift
+
+# Theme
+theme: minima
+
+# Navigation
+header_pages:
+  - getting-started/installation.md
+  - getting-started/quick-start.md
+  - migration/from-rover-4.md
+  - api-reference/rover.md
+  - performance/benchmarks.md
+
+# Plugin settings
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# SEO settings
+author: Eva Watts
+twitter:
+  username: RoverApp
+
+# Google Analytics (if needed)
+# google_analytics: G-XXXXXXXXXX
+
+# Custom variables
+rover:
+  version: "5.0.0"
+  github_url: "https://github.com/evawatts/Rover-IOS-EVA"
+  
+# Exclude from processing
+exclude:
+  - vendor/
+  - Gemfile
+  - Gemfile.lock
+  - README.md
